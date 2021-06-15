@@ -5,15 +5,16 @@ from datetime import datetime
 import logging
 
 logging.basicConfig(level=logging.INFO)
-interval = 60 * 60
-normal_price = 1.425
+interval = 10
+no_sleep = False
 
-# url = [
-#     'https://esgaming.hermanmiller.com/collections/menu/products/embody-gaming-chair'
-#     'https://esgaming.hermanmiller.com/collections/menu/products/aeron-chair-medium-b'
-#     ]
+urls = {
+    'https://esgaming.hermanmiller.com/collections/menu/products/embody-gaming-chair': 1.425,
+    'https://esgaming.hermanmiller.com/collections/menu/products/aeron-chair-medium-b': 1.427,
+    'https://esgaming.hermanmiller.com/collections/menu/products/sayl-chair-red': 678
+}
 
-url = 'https://esgaming.hermanmiller.com/collections/menu/products/aeron-chair-medium-b'
+discounted = []
 
 
 def get_response(*args):
@@ -40,15 +41,27 @@ def check_price(url):
     return price
 
 while True:
-    now = datetime.now()
-    now_price = check_price(url)
-    price = float(now_price.contents[0].replace(',', ''))
-
-    if price < normal_price:
-        logging.info(f"Discount baby!: {price}")
-        break
+    if ((len(discounted)) < len(urls)):
+        for url, normal_price in urls.items():
+            if url not in discounted:
+                now = datetime.now()
+                now_price = check_price(url)
+                price = float(now_price.contents[0].replace(',', ''))
+                if price < normal_price:
+                    logging.info(f"Discount baby!: {price}")
+                    discounted.append(url)
+                    continue
+                else:
+                    logging.info(f"{now} - No change in price: {price}")
+                    logging.info(f'Adding to discounted list anyway')
+                    discounted.append(url)
+                    continue
+            # logging.info(f'Sleeping for {interval}')
+            # sleep(interval)
     else:
-        logging.info(f"{now} - No change in price: {price}. Checking again in {interval} seconds")
-        sleep(interval)
-        continue
+        print('All items are now discounted. Exiting.') 
+        exit()
+
+    # logging.info(f'Sleeping for {interval}')
+    # sleep(interval)
 
