@@ -1,4 +1,5 @@
 import requests
+from requests.exceptions import HTTPError
 from bs4 import BeautifulSoup
 from time import sleep
 from datetime import datetime
@@ -55,7 +56,6 @@ while True:
             else:
                 logging.info(f"{now} - No change in price: €{price}")
                 if ((len(discounted)) < len(urls)):
-                    print(f'List contains: {discounted}')
                     continue
                 else:
                     exit('All items are now discounted. Exiting.') 
