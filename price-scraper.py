@@ -4,11 +4,10 @@ from bs4 import BeautifulSoup
 from time import sleep
 from datetime import datetime
 import logging
-
-"""Things left to do: Setup format logging to remove {now} prints
-    Improve/refactor error handling in request"""
+from notify import telegram_notify
 
 logging.basicConfig(level=logging.INFO)
+logging.basicConfig(filename="scraper.log", format='%(asctime)s %(message)s')
 interval = 60 * 60
 
 urls = {
@@ -28,9 +27,9 @@ def get_response(*args):
             response = requests.get(link)
             response.raise_for_status()
         except HTTPError as http_err:
-            logging.error(f'{now} - HTTP error occurred: {http_err}')
+            logging.error(f'HTTP error occurred: {http_err}')
         except Exception as err:
-            logging.error(f'{now} - Other error occurred: {err}')
+            logging.error(f'Other error occurred: {err}')
         else:
             return response
 
@@ -50,11 +49,11 @@ while True:
             now_price = check_price(url)
             price = float(now_price.contents[0].replace(',', ''))
             if price < normal_price:
-                logging.info(f"Discount baby!: €{price} @ {url}")
+                telegram_notify(f"Discount baby!: €{price} @ {url}")
                 discounted.append(url)
                 continue
             else:
-                logging.info(f"{now} - No change in price: €{price}")
+                logging.info(f"No change in price: €{price}")
                 if ((len(discounted)) < len(urls)):
                     continue
                 else:
