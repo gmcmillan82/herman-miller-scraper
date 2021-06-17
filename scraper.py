@@ -1,19 +1,23 @@
 import requests
+from requests.exceptions import HTTPError
 from bs4 import BeautifulSoup
 from time import sleep
 from datetime import datetime
 import logging
 
+"""Things left to do: Setup format logging to remove {now} prints
+    Improve/refactor error handling in request"""
+
 logging.basicConfig(level=logging.INFO)
 interval = 60 * 60
-normal_price = 1.425
 
-# url = [
-#     'https://esgaming.hermanmiller.com/collections/menu/products/embody-gaming-chair'
-#     'https://esgaming.hermanmiller.com/collections/menu/products/aeron-chair-medium-b'
-#     ]
+urls = {
+    'https://esgaming.hermanmiller.com/collections/menu/products/embody-gaming-chair': 1.425,
+    'https://esgaming.hermanmiller.com/collections/menu/products/aeron-chair-medium-b': 1.427,
+    'https://esgaming.hermanmiller.com/collections/menu/products/sayl-chair-red': 678
+}
 
-url = 'https://esgaming.hermanmiller.com/collections/menu/products/aeron-chair-medium-b'
+discounted = []
 
 
 def get_response(*args):
@@ -40,15 +44,21 @@ def check_price(url):
     return price
 
 while True:
-    now = datetime.now()
-    now_price = check_price(url)
-    price = float(now_price.contents[0].replace(',', ''))
-
-    if price < normal_price:
-        logging.info(f"Discount baby!: {price}")
-        break
-    else:
-        logging.info(f"{now} - No change in price: {price}. Checking again in {interval} seconds")
-        sleep(interval)
-        continue
+    for url, normal_price in urls.items():
+        if url not in discounted:
+            now = datetime.now()
+            now_price = check_price(url)
+            price = float(now_price.contents[0].replace(',', ''))
+            if price < normal_price:
+                logging.info(f"Discount baby!: €{price} @ {url}")
+                discounted.append(url)
+                continue
+            else:
+                logging.info(f"{now} - No change in price: €{price}")
+                if ((len(discounted)) < len(urls)):
+                    continue
+                else:
+                    exit('All items are now discounted. Exiting.') 
+    logging.info(f'Sleeping for {interval}')
+    sleep(interval)
 
