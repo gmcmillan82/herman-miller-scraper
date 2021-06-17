@@ -1,8 +1,8 @@
 FROM python:3.9.5-alpine
 
-COPY . /price-scraper
+COPY . /scraper
 
-RUN cd /price-scraper && \
+RUN cd /scraper && \
 	apk update && \
 	apk add --update --no-cache g++ \
 		gcc \
@@ -14,4 +14,4 @@ RUN cd /price-scraper && \
 	py3-lxml && \
 	pip3 install -r requirements.txt
 
-CMD ["python", "-u", "/stock-checkers/price-scraper.py"]
+CMD ["python", "-u", "/scraper/price-scraper.py"]
