@@ -2,12 +2,10 @@ import requests
 from requests.exceptions import HTTPError
 from bs4 import BeautifulSoup
 from time import sleep
-from datetime import datetime
 import logging
 from notify import telegram_notify
 
-logging.basicConfig(level=logging.INFO)
-logging.basicConfig(filename="scraper.log", format='%(asctime)s %(message)s')
+logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%d/%m/%Y %I:%M:%S', level=logging.INFO)
 interval = 60 * 60
 
 urls = {
@@ -45,7 +43,6 @@ def check_price(url):
 while True:
     for url, normal_price in urls.items():
         if url not in discounted:
-            now = datetime.now()
             now_price = check_price(url)
             price = float(now_price.contents[0].replace(',', ''))
             if price < normal_price:
