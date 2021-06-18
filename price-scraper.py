@@ -5,7 +5,7 @@ from time import sleep
 import logging
 from notify import telegram_notify
 
-logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%d/%m/%Y %I:%M:%S', level=logging.INFO)
+logging.basicConfig(format='%(levelname)s %(asctime)s - %(message)s', datefmt='%d/%m/%Y %I:%M:%S', level=logging.INFO)
 interval = 60 * 60
 
 urls = {
