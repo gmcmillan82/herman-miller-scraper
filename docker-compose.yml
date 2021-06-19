@@ -1,0 +1,10 @@
+---
+version: '3.9'
+services:
+    herman-scraper:
+        image: herman-miller-scraper:v1
+        container_name: hm_scraper
+        environment:
+            - CHAT_ID=${CHAT_ID}
+            - TELEGRAM_TOKEN=${TELEGRAM_TOKEN}
+        restart: always

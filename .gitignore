@@ -1,2 +1,3 @@
 Pipfile*
 *.log
+__pycache__*

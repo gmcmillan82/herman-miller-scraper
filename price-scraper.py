@@ -33,12 +33,13 @@ def get_response(*args):
 
 
 def check_price(url):
-    """Parse HTML on page and find stock value for item"""
+    """Parse HTML on page and find price for item"""
 
     response = get_response(url)
     soup = BeautifulSoup(response.content, 'lxml')
     price = soup.find('span', 'price')
     return price
+
 
 while True:
     for url, normal_price in urls.items():
