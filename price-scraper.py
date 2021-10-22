@@ -17,25 +17,8 @@ urls = {
 discounted = []
 
 
-def get_response(*args):
-    """Get HTTP response from server and handle gracefully"""
-
-    for link in args:
-        try:
-            response = requests.get(link)
-            response.raise_for_status()
-        except HTTPError as http_err:
-            logging.error(f'HTTP error occurred: {http_err}')
-        except Exception as err:
-            logging.error(f'Other error occurred: {err}')
-        else:
-            return response
-
-
-def check_price(url):
+def check_price(response):
     """Parse HTML on page and find price for item"""
-
-    response = get_response(url)
     soup = BeautifulSoup(response.content, 'lxml')
     price = soup.find('span', 'price')
     return price
@@ -44,18 +27,21 @@ def check_price(url):
 while True:
     for url, normal_price in urls.items():
         if url not in discounted:
-            now_price = check_price(url)
-            price = float(now_price.contents[0].replace(',', ''))
-            if price < normal_price:
-                telegram_notify(f"Discount baby!: €{price} @ {url}")
-                discounted.append(url)
-                continue
-            else:
-                logging.info(f"No change in price: €{price}")
-                if ((len(discounted)) < len(urls)):
+            req = requests.get(url)
+            if req.status_code == 200:
+                now_price = check_price(req)
+                price = float(now_price.contents[0].replace(',', ''))
+                if price < normal_price:
+                    telegram_notify(f"Discount baby!: €{price} @ {url}")
+                    discounted.append(url)
                     continue
                 else:
-                    exit('All items are now discounted. Exiting.') 
+                    logging.info(f"No change in price: €{price}")
+                    if ((len(discounted)) < len(urls)):
+                        continue
+                    else:
+                        exit('All items are now discounted. Exiting.')
+            else:
+                logging.info(f'Item not found {url}')
     logging.info(f'Sleeping for {interval}')
     sleep(interval)
-

@@ -1,3 +1,4 @@
 Pipfile*
 *.log
 __pycache__*
+env/
