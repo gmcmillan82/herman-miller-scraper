@@ -41,7 +41,7 @@ while True:
                         continue
                     else:
                         exit('All items are now discounted. Exiting.')
-            else:
+            elif req.status_code == 404:
                 logging.info(f'Item not found {url}')
     logging.info(f'Sleeping for {interval}')
     sleep(interval)
